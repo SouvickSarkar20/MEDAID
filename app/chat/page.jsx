@@ -1,12 +1,16 @@
 "use client";
 import { jwtDecode } from "jwt-decode";
+import { useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+
 import React, { useEffect, useState } from "react";
 
 const page = () => {
+  const router = useRouter();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [userId, setUserId] = useState(null);
-  const [chatId, setChatId] = useState(null);
+  const [chatId, setchatId] = useState(null);
 
   //getting userId from the token
   useEffect(() => {
@@ -20,7 +24,7 @@ const page = () => {
   }, []);
 
   //fetch chathistory if chatId exist
-  useEffect( () => {
+  useEffect(() => {
     if (!chatId) return;
     const fetchChatHistory = async () => {
       try {
@@ -75,8 +79,10 @@ const page = () => {
       console.log("API Response:", JSON.stringify(data, null, 2));
 
       if (data.chatId && !chatId) {
-        // Store chatId only if it's newly created
-        setChatId(data.chatId);
+        setchatId(data.chatId);
+        setTimeout(() => {
+          router.push(`/chat/${data.chatId}`);
+        }, 100); // Delay to ensure state update
       }
 
       if (data.response) {
